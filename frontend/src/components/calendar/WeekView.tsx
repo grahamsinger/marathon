@@ -23,8 +23,6 @@ export function WeekView() {
   const [editingDate, setEditingDate] = useState<string | null>(null);
   const [editingWorkout, setEditingWorkout] = useState<Workout | null>(null);
   const [swapSourceId, setSwapSourceId] = useState<number | null>(null);
-  const [editingTarget, setEditingTarget] = useState(false);
-  const [targetInput, setTargetInput] = useState('');
   const [editingNotes, setEditingNotes] = useState(false);
   const [notesInput, setNotesInput] = useState('');
 
@@ -54,45 +52,14 @@ export function WeekView() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <WeekNavigation weekStart={weekStart} onNavigate={setWeekStart} />
-        <MileageBar workouts={week?.workouts ?? []} target={week?.mileage_target ?? null} />
+        <MileageBar
+          workouts={week?.workouts ?? []}
+          target={week?.mileage_target ?? null}
+          onTargetChange={(t) => updateWeek({ mileage_target: t })}
+        />
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500">Target:</span>
-          {editingTarget ? (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                updateWeek({ mileage_target: parseFloat(targetInput) || 0 });
-                setEditingTarget(false);
-              }}
-              className="flex gap-1"
-            >
-              <input
-                type="number"
-                step="0.1"
-                value={targetInput}
-                onChange={(e) => setTargetInput(e.target.value)}
-                className="w-20 px-2 py-1 border rounded text-sm"
-                autoFocus
-              />
-              <button type="submit" className="text-sm text-blue-600">Set</button>
-              <button type="button" onClick={() => setEditingTarget(false)} className="text-sm text-gray-400">Cancel</button>
-            </form>
-          ) : (
-            <button
-              onClick={() => {
-                setTargetInput(week?.mileage_target?.toString() ?? '');
-                setEditingTarget(true);
-              }}
-              className="text-sm font-medium text-blue-600 hover:text-blue-800"
-            >
-              {week?.mileage_target ? `${week.mileage_target} mi` : 'Set target'}
-            </button>
-          )}
-        </div>
-
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-500">Notes:</span>
           {editingNotes ? (
@@ -160,6 +127,9 @@ export function WeekView() {
               }
             }}
             onDeleteWorkout={(id) => workoutActions.deleteWorkout(id)}
+            onToggleComplete={(w) =>
+              workoutActions.updateWorkout({ id: w.id, data: { is_completed: !w.is_completed } })
+            }
             swapSourceId={swapSourceId}
             onSwapSelect={handleSwapSelect}
           />

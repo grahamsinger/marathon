@@ -10,6 +10,7 @@ class WorkoutCreate(BaseModel):
     interval_pace_seconds: int | None = None
     duration_minutes: int | None = None
     description: str | None = None
+    is_completed: bool = False
 
 
 class WorkoutUpdate(BaseModel):
@@ -19,6 +20,7 @@ class WorkoutUpdate(BaseModel):
     interval_pace_seconds: int | None = None
     duration_minutes: int | None = None
     description: str | None = None
+    is_completed: bool | None = None
 
 
 class WorkoutResponse(BaseModel):
@@ -31,6 +33,7 @@ class WorkoutResponse(BaseModel):
     interval_pace_seconds: int | None
     duration_minutes: int | None
     description: str | None
+    is_completed: bool
 
     model_config = {"from_attributes": True}
 

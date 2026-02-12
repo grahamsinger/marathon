@@ -17,6 +17,7 @@ export interface Workout {
   interval_pace_seconds: number | null;
   duration_minutes: number | null;
   description: string | null;
+  is_completed: boolean;
 }
 
 export interface Week {

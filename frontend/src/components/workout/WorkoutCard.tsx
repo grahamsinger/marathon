@@ -6,24 +6,37 @@ interface Props {
   workout: Workout;
   onEdit: () => void;
   onDelete: () => void;
+  onToggleComplete: () => void;
   isSwapSource?: boolean;
   onSwapSelect?: () => void;
 }
 
-export function WorkoutCard({ workout, onEdit, onDelete, isSwapSource, onSwapSelect }: Props) {
+export function WorkoutCard({ workout, onEdit, onDelete, onToggleComplete, isSwapSource, onSwapSelect }: Props) {
   const colors = WORKOUT_TYPE_COLORS[workout.workout_type];
 
   return (
     <div
       className={`border rounded-lg p-3 cursor-pointer transition-all hover:shadow-sm ${colors} ${
         isSwapSource ? 'ring-2 ring-blue-500' : ''
-      }`}
+      } ${workout.is_completed ? 'opacity-60' : ''}`}
       onClick={onEdit}
     >
       <div className="flex items-start justify-between">
-        <span className="text-xs font-semibold uppercase tracking-wide">
-          {WORKOUT_TYPE_LABELS[workout.workout_type]}
-        </span>
+        <div className="flex items-center gap-1.5">
+          <input
+            type="checkbox"
+            checked={workout.is_completed}
+            onChange={(e) => {
+              e.stopPropagation();
+              onToggleComplete();
+            }}
+            onClick={(e) => e.stopPropagation()}
+            className="h-3.5 w-3.5 rounded cursor-pointer"
+          />
+          <span className={`text-xs font-semibold uppercase tracking-wide ${workout.is_completed ? 'line-through' : ''}`}>
+            {WORKOUT_TYPE_LABELS[workout.workout_type]}
+          </span>
+        </div>
         <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
           {onSwapSelect && (
             <button

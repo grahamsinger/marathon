@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Float, Date, String, Text, ForeignKey
+from sqlalchemy import Column, Integer, Float, Date, String, Text, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -16,5 +16,6 @@ class Workout(Base):
     interval_pace_seconds = Column(Integer, nullable=True)
     duration_minutes = Column(Integer, nullable=True)
     description = Column(Text, nullable=True)
+    is_completed = Column(Boolean, nullable=False, default=False)
 
     week = relationship("Week", back_populates="workouts")

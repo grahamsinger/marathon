@@ -8,6 +8,7 @@ interface Props {
   onAddWorkout: () => void;
   onEditWorkout: (workout: Workout) => void;
   onDeleteWorkout: (id: number) => void;
+  onToggleComplete: (workout: Workout) => void;
   swapSourceId: number | null;
   onSwapSelect: (workout: Workout) => void;
 }
@@ -18,6 +19,7 @@ export function DayCard({
   onAddWorkout,
   onEditWorkout,
   onDeleteWorkout,
+  onToggleComplete,
   swapSourceId,
   onSwapSelect,
 }: Props) {
@@ -42,6 +44,7 @@ export function DayCard({
             workout={workout}
             onEdit={() => onEditWorkout(workout)}
             onDelete={() => onDeleteWorkout(workout.id)}
+            onToggleComplete={() => onToggleComplete(workout)}
             isSwapSource={swapSourceId === workout.id}
             onSwapSelect={() => onSwapSelect(workout)}
           />
