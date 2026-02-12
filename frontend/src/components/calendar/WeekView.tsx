@@ -8,10 +8,15 @@ import { WeekNavigation } from './WeekNavigation';
 import { MileageBar } from './MileageBar';
 import { DayCard } from './DayCard';
 import { WorkoutForm } from '../workout/WorkoutForm';
+import { CompactWeekRow } from './CompactWeekRow';
 
 export function WeekView() {
   const [weekStart, setWeekStart] = useState(() => getMondayOfWeek(new Date()));
+  const prevWeekStart = addDays(weekStart, -7);
+  const nextWeekStart = addDays(weekStart, 7);
   const { data: week, isLoading, updateWeek } = useWeek(weekStart);
+  const { data: prevWeek } = useWeek(prevWeekStart);
+  const { data: nextWeek } = useWeek(nextWeekStart);
   const workoutActions = useWorkouts(weekStart);
   const { createTemplate } = useTemplates();
 
@@ -130,6 +135,12 @@ export function WeekView() {
         </div>
       )}
 
+      <CompactWeekRow
+        weekStart={prevWeekStart}
+        workouts={prevWeek?.workouts ?? []}
+        onNavigate={setWeekStart}
+      />
+
       <div className="grid grid-cols-7 gap-3">
         {days.map((date) => (
           <DayCard
@@ -154,6 +165,12 @@ export function WeekView() {
           />
         ))}
       </div>
+
+      <CompactWeekRow
+        weekStart={nextWeekStart}
+        workouts={nextWeek?.workouts ?? []}
+        onNavigate={setWeekStart}
+      />
 
       {editingDate && (
         <WorkoutForm
