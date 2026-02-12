@@ -22,10 +22,29 @@ export function Header() {
 
   const handleCopyIcal = () => {
     const url = `${window.location.origin}/api/ical/feed`;
-    navigator.clipboard.writeText(url).then(() => {
+    const onSuccess = () => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    });
+    };
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(url).then(onSuccess).catch(() => {
+        fallbackCopy(url, onSuccess);
+      });
+    } else {
+      fallbackCopy(url, onSuccess);
+    }
+  };
+
+  const fallbackCopy = (text: string, onSuccess: () => void) => {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    onSuccess();
   };
 
   return (

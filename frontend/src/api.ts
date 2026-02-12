@@ -43,6 +43,9 @@ export const deleteTemplate = (id: number) =>
 export const getPaceTrend = () =>
   api.get<PaceDataPoint[]>('/stats/pace-trend').then((r) => r.data);
 
+export const getTotalMileage = () =>
+  api.get<{ total_miles: number }>('/stats/total-mileage').then((r) => r.data);
+
 // Race info
 export const getRaceInfo = () =>
   api.get<RaceInfo>('/race-info').then((r) => r.data);

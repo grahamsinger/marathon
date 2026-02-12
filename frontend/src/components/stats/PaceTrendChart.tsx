@@ -1,11 +1,17 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer } from 'recharts';
+import { useQuery } from '@tanstack/react-query';
 import { usePaceTrend } from '../../hooks/usePaceTrend';
 import { useRaceInfo } from '../../hooks/useRaceInfo';
+import { getTotalMileage } from '../../api';
 import { formatPace } from '../../utils';
 
 export function PaceTrendChart() {
   const { data: paceData, isLoading } = usePaceTrend();
   const { data: raceInfo } = useRaceInfo();
+  const { data: totalMileage } = useQuery({
+    queryKey: ['total-mileage'],
+    queryFn: getTotalMileage,
+  });
 
   if (isLoading) {
     return <div className="animate-pulse h-64 bg-gray-200 rounded-lg" />;
@@ -33,7 +39,14 @@ export function PaceTrendChart() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-gray-900 mb-6">Long Run Pace Trend</h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold text-gray-900">Long Run Pace Trend</h2>
+        {totalMileage !== undefined && (
+          <span className="text-sm text-gray-600">
+            Total mileage: <span className="font-semibold text-gray-800">{totalMileage.total_miles} mi</span>
+          </span>
+        )}
+      </div>
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={chartData} margin={{ top: 10, right: 30, left: 20, bottom: 10 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -62,6 +75,11 @@ export function PaceTrendChart() {
             strokeWidth={2}
             dot={{ r: 5, fill: '#3b82f6' }}
             activeDot={{ r: 7 }}
+            label={({ x, y, value }: { x: number; y: number; value: number }) => (
+              <text x={x} y={y - 12} textAnchor="middle" fill="#3b82f6" fontSize={11} fontWeight={500}>
+                {formatPace(value)}
+              </text>
+            )}
           />
         </LineChart>
       </ResponsiveContainer>
