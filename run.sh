@@ -18,7 +18,7 @@ BACKEND_PID=$!
 
 echo "Starting frontend..."
 cd "$DIR/frontend"
-npm run dev &
+npm run dev:network &
 FRONTEND_PID=$!
 
 echo ""

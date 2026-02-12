@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { RaceCountdown } from './RaceCountdown';
+import { FeedbackModal } from '../feedback/FeedbackModal';
 
 export function Header() {
   const location = useLocation();
@@ -29,10 +30,10 @@ export function Header() {
 
   return (
     <header className="border-b bg-white">
-      <div className="max-w-6xl mx-auto px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <h1 className="text-lg font-bold text-gray-900">Marathon Training</h1>
+      <div className="mx-auto px-4 py-3">
+        <div className="flex items-center justify-between gap-6">
+          <div className="flex items-center gap-6 shrink-0">
+            <h1 className="text-lg font-bold text-gray-900 whitespace-nowrap">Marathon Training</h1>
             <nav className="flex gap-1">
               {navLink('/', 'Calendar')}
               {navLink('/templates', 'Templates')}
@@ -40,12 +41,15 @@ export function Header() {
             </nav>
             <button
               onClick={handleCopyIcal}
-              className="px-3 py-1.5 rounded text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+              className="px-3 py-1.5 rounded text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors whitespace-nowrap"
             >
               {copied ? 'Copied!' : 'iCal Link'}
             </button>
           </div>
-          <RaceCountdown />
+          <div className="flex items-center gap-4 shrink-0">
+            <RaceCountdown />
+            <FeedbackModal />
+          </div>
         </div>
       </div>
     </header>

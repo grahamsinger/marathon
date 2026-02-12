@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Week, Workout, WorkoutTemplate, PaceDataPoint, RaceInfo } from './types';
+import type { Week, Workout, WorkoutTemplate, PaceDataPoint, RaceInfo, Feedback } from './types';
 
 const api = axios.create({ baseURL: '/api' });
 
@@ -46,3 +46,7 @@ export const getPaceTrend = () =>
 // Race info
 export const getRaceInfo = () =>
   api.get<RaceInfo>('/race-info').then((r) => r.data);
+
+// Feedback
+export const createFeedback = (data: { message: string; page?: string | null }) =>
+  api.post<Feedback>('/feedback', data).then((r) => r.data);

@@ -52,6 +52,13 @@ export interface RaceInfo {
   goal_pace_seconds: number;
 }
 
+export interface Feedback {
+  id: number;
+  message: string;
+  page: string | null;
+  created_at: string;
+}
+
 export const WORKOUT_TYPE_LABELS: Record<WorkoutType, string> = {
   long_run: 'Long Run',
   medium_long_run: 'Medium Long Run',
