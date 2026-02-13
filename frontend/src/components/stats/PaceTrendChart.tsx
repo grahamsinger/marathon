@@ -59,7 +59,7 @@ export function PaceTrendChart() {
             label={{ value: 'Pace (min/mi)', angle: -90, position: 'insideLeft', offset: -5, style: { fontSize: 12 } }}
           />
           <Tooltip
-            formatter={(value: number) => [formatPace(value) + '/mi', 'Pace']}
+            formatter={(value: any) => [formatPace(value) + '/mi', 'Pace']}
             labelStyle={{ fontWeight: 600 }}
           />
           <ReferenceLine
@@ -75,7 +75,7 @@ export function PaceTrendChart() {
             strokeWidth={2}
             dot={{ r: 5, fill: '#3b82f6' }}
             activeDot={{ r: 7 }}
-            label={({ x, y, value }: { x: number; y: number; value: number }) => (
+            label={({ x, y, value }: any) => (
               <text x={x} y={y - 12} textAnchor="middle" fill="#3b82f6" fontSize={11} fontWeight={500}>
                 {formatPace(value)}
               </text>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { Workout, WorkoutType } from '../../types';
+import type { Workout, WorkoutType, WorkoutTemplate } from '../../types';
 import { WORKOUT_TYPE_LABELS, RUNNING_TYPES } from '../../types';
 import { PaceInput } from './PaceInput';
 import { TemplatePicker } from '../template/TemplatePicker';
@@ -11,15 +11,7 @@ interface Props {
   onSave: (data: Partial<Workout> & { date: string; workout_type: string }) => void;
   onUpdate: (id: number, data: Partial<Workout>) => void;
   onDelete?: (id: number) => void;
-  onSaveAsTemplate: (data: {
-    name: string;
-    workout_type: string;
-    distance?: number | null;
-    pace_seconds?: number | null;
-    interval_pace_seconds?: number | null;
-    duration_minutes?: number | null;
-    description?: string | null;
-  }) => void;
+  onSaveAsTemplate: (data: Omit<WorkoutTemplate, 'id'>) => void;
   onApplyTemplate: (templateId: number, date: string) => void;
   onClose: () => void;
 }
