@@ -7,6 +7,7 @@ export function useWorkouts(weekStart: string) {
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['week', weekStart] });
+    queryClient.invalidateQueries({ queryKey: ['workouts', 'all'] });
   };
 
   const create = useMutation({

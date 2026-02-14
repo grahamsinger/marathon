@@ -26,6 +26,9 @@ export const createFromTemplate = (templateId: number, date: string) =>
 export const swapWorkouts = (id1: number, id2: number) =>
   api.post<Workout[]>('/workouts/swap', { workout_id_1: id1, workout_id_2: id2 }).then((r) => r.data);
 
+export const fetchAllWorkouts = () =>
+  api.get<Workout[]>('/workouts/all').then((r) => r.data);
+
 // Templates
 export const getTemplates = () =>
   api.get<WorkoutTemplate[]>('/templates').then((r) => r.data);

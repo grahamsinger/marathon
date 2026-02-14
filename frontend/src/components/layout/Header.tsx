@@ -57,6 +57,7 @@ export function Header() {
               {navLink('/', 'Calendar')}
               {navLink('/templates', 'Templates')}
               {navLink('/pace', 'Pace Trend')}
+              {navLink('/summary', 'Summary')}
             </nav>
             <button
               onClick={handleCopyIcal}

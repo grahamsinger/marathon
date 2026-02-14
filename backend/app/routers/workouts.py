@@ -32,6 +32,11 @@ def _get_or_create_week(db: Session, workout_date: date) -> Week:
     return week
 
 
+@router.get("/all", response_model=list[WorkoutResponse])
+def list_all_workouts(db: Session = Depends(get_db)):
+    return db.query(Workout).order_by(Workout.date.desc()).all()
+
+
 @router.get("", response_model=list[WorkoutResponse])
 def list_workouts(week_start: date, db: Session = Depends(get_db)):
     week_start = _monday_of(week_start)

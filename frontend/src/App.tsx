@@ -4,6 +4,7 @@ import { Layout } from './components/layout/Layout';
 import { WeekView } from './components/calendar/WeekView';
 import { TemplateList } from './components/template/TemplateList';
 import { PaceTrendChart } from './components/stats/PaceTrendChart';
+import { WorkoutSummary } from './components/summary/WorkoutSummary';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,6 +24,7 @@ export default function App() {
             <Route path="/" element={<WeekView />} />
             <Route path="/templates" element={<TemplateList />} />
             <Route path="/pace" element={<PaceTrendChart />} />
+            <Route path="/summary" element={<WorkoutSummary />} />
           </Route>
         </Routes>
       </BrowserRouter>
