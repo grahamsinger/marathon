@@ -4,7 +4,7 @@ import { WorkoutCard } from '../workout/WorkoutCard';
 
 interface Props {
   date: string;
-  workout?: Workout;
+  workouts: Workout[];
   onAddWorkout: () => void;
   onEditWorkout: (workout: Workout) => void;
   onDeleteWorkout: (id: number) => void;
@@ -15,7 +15,7 @@ interface Props {
 
 export function DayCard({
   date,
-  workout,
+  workouts,
   onAddWorkout,
   onEditWorkout,
   onDeleteWorkout,
@@ -38,16 +38,27 @@ export function DayCard({
         {today && <span className="text-[10px] font-bold text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded">TODAY</span>}
       </div>
 
-      <div className="flex-1">
-        {workout ? (
-          <WorkoutCard
-            workout={workout}
-            onEdit={() => onEditWorkout(workout)}
-            onDelete={() => onDeleteWorkout(workout.id)}
-            onToggleComplete={() => onToggleComplete(workout)}
-            isSwapSource={swapSourceId === workout.id}
-            onSwapSelect={() => onSwapSelect(workout)}
-          />
+      <div className="flex-1 flex flex-col gap-2">
+        {workouts.length > 0 ? (
+          <>
+            {workouts.map((workout) => (
+              <WorkoutCard
+                key={workout.id}
+                workout={workout}
+                onEdit={() => onEditWorkout(workout)}
+                onDelete={() => onDeleteWorkout(workout.id)}
+                onToggleComplete={() => onToggleComplete(workout)}
+                isSwapSource={swapSourceId === workout.id}
+                onSwapSelect={() => onSwapSelect(workout)}
+              />
+            ))}
+            <button
+              onClick={onAddWorkout}
+              className="w-full py-1 border border-dashed border-gray-200 rounded-lg text-gray-400 hover:text-gray-600 hover:border-gray-300 transition-colors text-xs"
+            >
+              + Add
+            </button>
+          </>
         ) : (
           <button
             onClick={onAddWorkout}

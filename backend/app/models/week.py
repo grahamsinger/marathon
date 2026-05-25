@@ -12,4 +12,9 @@ class Week(Base):
     mileage_target = Column(Float, nullable=True)
     notes = Column(Text, nullable=True)
 
-    workouts = relationship("Workout", back_populates="week", cascade="all, delete-orphan")
+    workouts = relationship(
+        "Workout",
+        back_populates="week",
+        cascade="all, delete-orphan",
+        order_by="Workout.id",
+    )

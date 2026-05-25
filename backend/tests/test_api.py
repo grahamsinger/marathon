@@ -74,17 +74,23 @@ def test_delete_workout(client):
     assert len(r3.json()["workouts"]) == 0
 
 
-def test_duplicate_date_rejected(client):
+def test_multiple_workouts_per_day_allowed(client):
     client.get("/api/weeks/2026-03-02")
-    client.post("/api/workouts", json={
+    r1 = client.post("/api/workouts", json={
         "date": "2026-03-02",
-        "workout_type": "easy_run",
+        "workout_type": "strength",
     })
-    r = client.post("/api/workouts", json={
+    assert r1.status_code == 201
+    r2 = client.post("/api/workouts", json={
         "date": "2026-03-02",
-        "workout_type": "rest",
+        "workout_type": "long_run",
+        "distance": 10.0,
     })
-    assert r.status_code == 400
+    assert r2.status_code == 201
+
+    week = client.get("/api/weeks/2026-03-02").json()
+    same_day = [w for w in week["workouts"] if w["date"] == "2026-03-02"]
+    assert len(same_day) == 2
 
 
 def test_swap_workouts(client):

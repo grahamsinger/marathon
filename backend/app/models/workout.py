@@ -9,7 +9,7 @@ class Workout(Base):
 
     id = Column(Integer, primary_key=True)
     week_id = Column(Integer, ForeignKey("weeks.id"), nullable=False)
-    date = Column(Date, unique=True, nullable=False, index=True)
+    date = Column(Date, nullable=False, index=True)
     workout_type = Column(String(50), nullable=False)
     distance = Column(Float, nullable=True)
     pace_seconds = Column(Integer, nullable=True)

@@ -1,6 +1,5 @@
 from datetime import date, timedelta
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -48,10 +47,6 @@ def list_workouts(week_start: date, db: Session = Depends(get_db)):
 
 @router.post("", response_model=WorkoutResponse, status_code=201)
 def create_workout(data: WorkoutCreate, db: Session = Depends(get_db)):
-    existing = db.query(Workout).filter(Workout.date == data.date).first()
-    if existing:
-        raise HTTPException(400, "A workout already exists on this date")
-
     week = _get_or_create_week(db, data.date)
     workout = Workout(week_id=week.id, **data.model_dump())
     db.add(workout)
@@ -90,10 +85,6 @@ def create_from_template(data: WorkoutFromTemplate, db: Session = Depends(get_db
     if not template:
         raise HTTPException(404, "Template not found")
 
-    existing = db.query(Workout).filter(Workout.date == data.date).first()
-    if existing:
-        raise HTTPException(400, "A workout already exists on this date")
-
     week = _get_or_create_week(db, data.date)
     workout = Workout(
         week_id=week.id,
@@ -118,21 +109,9 @@ def swap_workouts(data: WorkoutSwap, db: Session = Depends(get_db)):
     if not w1 or not w2:
         raise HTTPException(404, "Workout not found")
 
-    # Use raw SQL to swap dates atomically, avoiding UNIQUE constraint issues
-    date1, date2 = w1.date, w2.date
-    week_id1, week_id2 = w1.week_id, w2.week_id
-    db.execute(
-        text("UPDATE workouts SET date = :temp_date, week_id = :week_id WHERE id = :id"),
-        {"temp_date": "1900-01-01", "week_id": week_id2, "id": w1.id},
-    )
-    db.execute(
-        text("UPDATE workouts SET date = :date, week_id = :week_id WHERE id = :id"),
-        {"date": str(date1), "week_id": week_id1, "id": w2.id},
-    )
-    db.execute(
-        text("UPDATE workouts SET date = :date WHERE id = :id"),
-        {"date": str(date2), "id": w1.id},
-    )
+    # No UNIQUE constraint on date anymore, so swap dates/weeks directly.
+    w1.date, w2.date = w2.date, w1.date
+    w1.week_id, w2.week_id = w2.week_id, w1.week_id
     db.commit()
     db.refresh(w1)
     db.refresh(w2)

@@ -28,8 +28,8 @@ export function WeekView() {
 
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
-  const workoutByDate = useCallback(
-    (date: string) => week?.workouts.find((w) => w.date === date),
+  const workoutsByDate = useCallback(
+    (date: string) => week?.workouts.filter((w) => w.date === date) ?? [],
     [week]
   );
 
@@ -113,7 +113,7 @@ export function WeekView() {
           <DayCard
             key={date}
             date={date}
-            workout={workoutByDate(date)}
+            workouts={workoutsByDate(date)}
             onAddWorkout={() => {
               setEditingDate(date);
               setEditingWorkout(null);
