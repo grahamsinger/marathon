@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useState, useMemo } from 'react';
+import { useQueryClient, useQueries } from '@tanstack/react-query';
 import { useAllWorkouts } from '../../hooks/useAllWorkouts';
 import { useWorkouts } from '../../hooks/useWorkouts';
 import { useTemplates } from '../../hooks/useTemplates';
-import { updateWorkout as updateWorkoutApi } from '../../api';
+import { updateWorkout as updateWorkoutApi, getWeek } from '../../api';
 import { formatPace, formatDate, getMondayOfWeek } from '../../utils';
 import { WORKOUT_TYPE_LABELS, WORKOUT_TYPE_COLORS } from '../../types';
 import type { Workout, WorkoutType } from '../../types';
@@ -70,15 +70,29 @@ function WorkoutRow({
   );
 }
 
-function WeeklyMileage({ workouts }: { workouts: Workout[] }) {
+function WeeklyMileage({
+  workouts,
+  targetByWeek,
+}: {
+  workouts: Workout[];
+  targetByWeek: Record<string, number | null>;
+}) {
+  // Progress counts mileage actually run (completed), not the full plan — a week
+  // with 24 mi planned but only 3 mi run is short of a 24 mi target, not "met".
   const byWeek = new Map<string, number>();
   for (const w of workouts) {
     const monday = getMondayOfWeek(new Date(w.date + 'T00:00:00'));
-    byWeek.set(monday, (byWeek.get(monday) ?? 0) + (w.distance ?? 0));
+    const done = w.is_completed ? w.distance ?? 0 : 0;
+    byWeek.set(monday, (byWeek.get(monday) ?? 0) + done);
   }
   // Chronological (oldest week first) so the mileage build reads top to bottom.
   const weeks = Array.from(byWeek.entries()).sort((a, b) => a[0].localeCompare(b[0]));
-  const max = Math.max(1, ...weeks.map(([, mi]) => mi));
+  // Scale bars (and the target marker) so both fit within the track.
+  const max = Math.max(
+    1,
+    ...weeks.map(([, mi]) => mi),
+    ...weeks.map(([m]) => targetByWeek[m] ?? 0),
+  );
 
   if (weeks.length === 0) return null;
 
@@ -91,17 +105,44 @@ function WeeklyMileage({ workouts }: { workouts: Workout[] }) {
             month: 'short',
             day: 'numeric',
           });
+          const target = targetByWeek[monday] ?? null;
+          const delta = target != null ? miles - target : 0;
+          const status =
+            target == null ? 'none' : delta > 0.05 ? 'over' : delta < -0.05 ? 'short' : 'met';
+          const fill =
+            status === 'short' ? 'bg-amber-400' : status === 'none' ? 'bg-blue-400' : 'bg-green-500';
+
           return (
             <div key={monday} className="flex items-center gap-3 text-sm">
               <span className="w-24 text-gray-500 whitespace-nowrap">Wk of {label}</span>
-              <div className="flex-1 bg-gray-100 rounded h-4 overflow-hidden">
-                <div
-                  className="h-full bg-blue-400 rounded"
-                  style={{ width: `${(miles / max) * 100}%` }}
-                />
+              <div className="relative flex-1 bg-gray-100 rounded h-4 overflow-hidden">
+                <div className={`h-full rounded ${fill}`} style={{ width: `${(miles / max) * 100}%` }} />
+                {target != null && (
+                  <div
+                    className="absolute top-0 bottom-0 w-0.5 bg-gray-600"
+                    style={{ left: `${(target / max) * 100}%` }}
+                    title={`target ${target} mi`}
+                  />
+                )}
               </div>
-              <span className="w-16 text-right text-gray-700 tabular-nums">
-                {miles.toFixed(1)} mi
+              <span className="w-28 text-right text-gray-700 tabular-nums whitespace-nowrap">
+                {miles.toFixed(1)}
+                {target != null ? ` / ${target}` : ''} mi
+              </span>
+              <span className="w-16 text-right">
+                {status === 'met' && (
+                  <span className="px-1.5 py-0.5 rounded text-xs bg-green-100 text-green-700">met</span>
+                )}
+                {status === 'over' && (
+                  <span className="px-1.5 py-0.5 rounded text-xs bg-green-100 text-green-700">
+                    +{delta.toFixed(1)}
+                  </span>
+                )}
+                {status === 'short' && (
+                  <span className="px-1.5 py-0.5 rounded text-xs bg-amber-100 text-amber-700">
+                    {delta.toFixed(1)}
+                  </span>
+                )}
               </span>
             </div>
           );
@@ -121,6 +162,22 @@ export function WorkoutSummary() {
     : '';
   const workoutActions = useWorkouts(weekStart);
   const { createTemplate } = useTemplates();
+
+  // Reuse the existing per-week endpoint to pull each week's mileage target.
+  const weekStarts = useMemo(() => {
+    const set = new Set<string>();
+    (workouts ?? []).forEach((w) => set.add(getMondayOfWeek(new Date(w.date + 'T00:00:00'))));
+    return Array.from(set);
+  }, [workouts]);
+
+  const weekQueries = useQueries({
+    queries: weekStarts.map((ws) => ({ queryKey: ['week', ws], queryFn: () => getWeek(ws) })),
+  });
+
+  const targetByWeek: Record<string, number | null> = {};
+  weekQueries.forEach((q) => {
+    if (q.data) targetByWeek[q.data.week_start] = q.data.mileage_target;
+  });
 
   const handleToggleComplete = (workout: Workout) => {
     const ws = getMondayOfWeek(new Date(workout.date + 'T00:00:00'));
@@ -146,7 +203,7 @@ export function WorkoutSummary() {
 
   return (
     <div>
-      <WeeklyMileage workouts={workouts} />
+      <WeeklyMileage workouts={workouts} targetByWeek={targetByWeek} />
       <div className="overflow-x-auto">
       <table className="w-full text-left">
         <thead>
