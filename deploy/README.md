@@ -27,9 +27,22 @@ in git — it's the live data and is backed up to iCloud instead.
 | `./serve.sh` | Dev/manual: rebuild frontend + run app in foreground | no |
 | `./deploy/backup_db.sh` | Snapshot the DB to iCloud now (also runs daily) | no |
 | `./deploy/restore_db.sh` | Restore the DB from a snapshot | no |
+| `./status.sh` | Health check: app, proxy, API, launchd agents, last backup age | no |
 
 After changing the **frontend**, rebuild so the served files update:
 `cd frontend && npm run build` (or run `./serve.sh` once).
+
+## Checking health (after sleep, reboot, or a missed backup)
+
+```bash
+./status.sh
+```
+
+Sleep/wake keeps everything running. After a full **reboot**, the app returns at
+login automatically; **Apache** only returns on boot if you ran the one-time enable
+(see "First-time" below) — otherwise run `./start_httpd.sh`. The status check shows
+the last backup's age, so you can confirm the daily backup is current even if the
+noon run was missed while the Mac was closed (it then runs on next wake/login).
 
 ## Backups
 
