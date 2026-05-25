@@ -7,6 +7,7 @@ class WorkoutCreate(BaseModel):
     workout_type: str
     distance: float | None = None
     pace_seconds: int | None = None
+    actual_pace_seconds: int | None = None
     interval_pace_seconds: int | None = None
     duration_minutes: int | None = None
     description: str | None = None
@@ -17,6 +18,7 @@ class WorkoutUpdate(BaseModel):
     workout_type: str | None = None
     distance: float | None = None
     pace_seconds: int | None = None
+    actual_pace_seconds: int | None = None
     interval_pace_seconds: int | None = None
     duration_minutes: int | None = None
     description: str | None = None
@@ -30,6 +32,7 @@ class WorkoutResponse(BaseModel):
     workout_type: str
     distance: float | None
     pace_seconds: int | None
+    actual_pace_seconds: int | None
     interval_pace_seconds: int | None
     duration_minutes: int | None
     description: str | None

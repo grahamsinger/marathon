@@ -12,7 +12,8 @@ class Workout(Base):
     date = Column(Date, nullable=False, index=True)
     workout_type = Column(String(50), nullable=False)
     distance = Column(Float, nullable=True)
-    pace_seconds = Column(Integer, nullable=True)
+    pace_seconds = Column(Integer, nullable=True)  # target / planned pace
+    actual_pace_seconds = Column(Integer, nullable=True)  # actual pace run
     interval_pace_seconds = Column(Integer, nullable=True)
     duration_minutes = Column(Integer, nullable=True)
     description = Column(Text, nullable=True)

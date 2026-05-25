@@ -59,7 +59,8 @@ export function WorkoutCard({ workout, onEdit, onDelete, onToggleComplete, isSwa
 
       <div className="mt-1 text-sm space-y-0.5">
         {workout.distance && <div>{workout.distance} mi</div>}
-        {workout.pace_seconds && <div>{formatPace(workout.pace_seconds)}/mi</div>}
+        {workout.pace_seconds && <div>Target {formatPace(workout.pace_seconds)}/mi</div>}
+        {workout.actual_pace_seconds && <div>Actual {formatPace(workout.actual_pace_seconds)}/mi</div>}
         {workout.interval_pace_seconds && (
           <div>Intervals: {formatPace(workout.interval_pace_seconds)}/mi</div>
         )}

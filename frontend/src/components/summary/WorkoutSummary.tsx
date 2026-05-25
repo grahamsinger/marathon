@@ -37,8 +37,11 @@ function WorkoutRow({
       <td className="py-2.5 px-3 text-sm text-gray-700 text-right">
         {workout.distance != null ? `${workout.distance} mi` : '—'}
       </td>
-      <td className="py-2.5 px-3 text-sm text-gray-700 text-right">
+      <td className="py-2.5 px-3 text-sm text-gray-700 text-right whitespace-nowrap">
         {workout.pace_seconds != null ? `${formatPace(workout.pace_seconds)} /mi` : '—'}
+        {workout.actual_pace_seconds != null && (
+          <div className="text-xs text-gray-400">act {formatPace(workout.actual_pace_seconds)} /mi</div>
+        )}
       </td>
       <td className="py-2.5 px-3 text-sm text-gray-700 text-right">
         {workout.duration_minutes != null
@@ -108,7 +111,7 @@ export function WorkoutSummary() {
             <th className="py-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
             <th className="py-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</th>
             <th className="py-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Distance</th>
-            <th className="py-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Pace</th>
+            <th className="py-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Pace (target / act)</th>
             <th className="py-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Duration</th>
             <th className="py-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Done</th>
           </tr>

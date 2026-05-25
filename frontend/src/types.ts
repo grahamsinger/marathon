@@ -14,6 +14,7 @@ export interface Workout {
   workout_type: WorkoutType;
   distance: number | null;
   pace_seconds: number | null;
+  actual_pace_seconds: number | null;
   interval_pace_seconds: number | null;
   duration_minutes: number | null;
   description: string | null;

@@ -33,6 +33,7 @@ export function WorkoutForm({
   const [workoutType, setWorkoutType] = useState<WorkoutType>(workout?.workout_type ?? 'easy_run');
   const [distance, setDistance] = useState(workout?.distance?.toString() ?? '');
   const [paceSeconds, setPaceSeconds] = useState<number | null>(workout?.pace_seconds ?? null);
+  const [actualPaceSeconds, setActualPaceSeconds] = useState<number | null>(workout?.actual_pace_seconds ?? null);
   const [intervalPaceSeconds, setIntervalPaceSeconds] = useState<number | null>(workout?.interval_pace_seconds ?? null);
   const [durationMinutes, setDurationMinutes] = useState(workout?.duration_minutes?.toString() ?? '');
   const [description, setDescription] = useState(workout?.description ?? '');
@@ -52,6 +53,7 @@ export function WorkoutForm({
       setWorkoutType(workout.workout_type);
       setDistance(workout.distance?.toString() ?? '');
       setPaceSeconds(workout.pace_seconds ?? null);
+      setActualPaceSeconds(workout.actual_pace_seconds ?? null);
       setIntervalPaceSeconds(workout.interval_pace_seconds ?? null);
       setDurationMinutes(workout.duration_minutes?.toString() ?? '');
       setDescription(workout.description ?? '');
@@ -64,6 +66,7 @@ export function WorkoutForm({
       workout_type: workoutType,
       distance: distance ? parseFloat(distance) : null,
       pace_seconds: showPace ? paceSeconds : null,
+      actual_pace_seconds: showPace ? actualPaceSeconds : null,
       interval_pace_seconds: showIntervalPace ? intervalPaceSeconds : null,
       duration_minutes: showDuration && durationMinutes ? parseInt(durationMinutes) : null,
       description: description || null,
@@ -145,7 +148,8 @@ export function WorkoutForm({
             </div>
           )}
 
-          {showPace && <PaceInput value={paceSeconds} onChange={setPaceSeconds} label="Pace" />}
+          {showPace && <PaceInput value={paceSeconds} onChange={setPaceSeconds} label="Target Pace" />}
+          {showPace && <PaceInput value={actualPaceSeconds} onChange={setActualPaceSeconds} label="Actual Pace" />}
           {showIntervalPace && (
             <PaceInput value={intervalPaceSeconds} onChange={setIntervalPaceSeconds} label="Interval Pace" />
           )}
