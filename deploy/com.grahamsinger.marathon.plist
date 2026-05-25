@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Marathon Training app: keep the API+frontend server running on :8000.
+         Canonical copy lives here in deploy/; installed to:
+           ~/Library/LaunchAgents/com.grahamsinger.marathon.plist
+         Runs uvicorn directly (not serve.sh) so it does NOT rebuild the
+         frontend on every boot. Rebuild the UI manually with ./serve.sh or
+         `cd frontend && npm run build` whenever you change the frontend. -->
+    <key>Label</key>
+    <string>com.grahamsinger.marathon</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/grahamsinger/.config/local/bin/uv</string>
+        <string>run</string>
+        <string>uvicorn</string>
+        <string>app.main:app</string>
+        <string>--host</string>
+        <string>0.0.0.0</string>
+        <string>--port</string>
+        <string>8000</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/grahamsinger/dev/claude_code/marathon_training/backend</string>
+
+    <!-- Start at login and restart if it ever exits or crashes. -->
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/grahamsinger/dev/claude_code/marathon_training/marathon.app.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/grahamsinger/dev/claude_code/marathon_training/marathon.app.log</string>
+</dict>
+</plist>
