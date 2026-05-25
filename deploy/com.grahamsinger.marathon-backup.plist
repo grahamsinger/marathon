@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Daily backup of the Marathon Training database to iCloud Drive.
+         Canonical copy lives in deploy/; installed to:
+           ~/Library/LaunchAgents/com.grahamsinger.marathon-backup.plist
+         This is a run-and-exit job (no KeepAlive): it fires once at load and
+         then daily at noon. If the Mac is asleep at noon, launchd runs it on
+         the next wake. -->
+    <key>Label</key>
+    <string>com.grahamsinger.marathon-backup</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/grahamsinger/dev/claude_code/marathon_training/deploy/backup_db.sh</string>
+    </array>
+
+    <!-- Run once when loaded (so the first snapshot happens immediately)... -->
+    <key>RunAtLoad</key>
+    <true/>
+    <!-- ...and every day at 12:00. -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>12</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/grahamsinger/dev/claude_code/marathon_training/marathon.backup.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/grahamsinger/dev/claude_code/marathon_training/marathon.backup.log</string>
+</dict>
+</plist>
