@@ -70,6 +70,47 @@ function WorkoutRow({
   );
 }
 
+function WeeklyMileage({ workouts }: { workouts: Workout[] }) {
+  const byWeek = new Map<string, number>();
+  for (const w of workouts) {
+    const monday = getMondayOfWeek(new Date(w.date + 'T00:00:00'));
+    byWeek.set(monday, (byWeek.get(monday) ?? 0) + (w.distance ?? 0));
+  }
+  // Chronological (oldest week first) so the mileage build reads top to bottom.
+  const weeks = Array.from(byWeek.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+  const max = Math.max(1, ...weeks.map(([, mi]) => mi));
+
+  if (weeks.length === 0) return null;
+
+  return (
+    <div className="mb-6">
+      <h3 className="text-sm font-semibold text-gray-700 mb-2">Weekly mileage</h3>
+      <div className="space-y-1.5">
+        {weeks.map(([monday, miles]) => {
+          const label = new Date(monday + 'T00:00:00').toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+          });
+          return (
+            <div key={monday} className="flex items-center gap-3 text-sm">
+              <span className="w-24 text-gray-500 whitespace-nowrap">Wk of {label}</span>
+              <div className="flex-1 bg-gray-100 rounded h-4 overflow-hidden">
+                <div
+                  className="h-full bg-blue-400 rounded"
+                  style={{ width: `${(miles / max) * 100}%` }}
+                />
+              </div>
+              <span className="w-16 text-right text-gray-700 tabular-nums">
+                {miles.toFixed(1)} mi
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export function WorkoutSummary() {
   const { data: workouts, isLoading } = useAllWorkouts();
   const [editingWorkout, setEditingWorkout] = useState<Workout | null>(null);
@@ -104,7 +145,9 @@ export function WorkoutSummary() {
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div>
+      <WeeklyMileage workouts={workouts} />
+      <div className="overflow-x-auto">
       <table className="w-full text-left">
         <thead>
           <tr className="border-b-2 border-gray-200">
@@ -127,6 +170,7 @@ export function WorkoutSummary() {
           ))}
         </tbody>
       </table>
+      </div>
 
       {editingWorkout && (
         <WorkoutForm
