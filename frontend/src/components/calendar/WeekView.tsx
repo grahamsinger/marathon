@@ -9,6 +9,7 @@ import { MileageBar } from './MileageBar';
 import { DayCard } from './DayCard';
 import { WorkoutForm } from '../workout/WorkoutForm';
 import { CompactWeekRow } from './CompactWeekRow';
+import { DayTemplatePicker } from '../template/DayTemplatePicker';
 
 export function WeekView() {
   const [weekStart, setWeekStart] = useState(() => getMondayOfWeek(new Date()));
@@ -22,6 +23,7 @@ export function WeekView() {
 
   const [editingDate, setEditingDate] = useState<string | null>(null);
   const [editingWorkout, setEditingWorkout] = useState<Workout | null>(null);
+  const [templateDate, setTemplateDate] = useState<string | null>(null);
   const [swapSourceId, setSwapSourceId] = useState<number | null>(null);
   const [editingNotes, setEditingNotes] = useState(false);
   const [notesInput, setNotesInput] = useState('');
@@ -118,6 +120,7 @@ export function WeekView() {
               setEditingDate(date);
               setEditingWorkout(null);
             }}
+            onOpenTemplates={() => setTemplateDate(date)}
             onEditWorkout={(w) => {
               if (swapSourceId !== null) {
                 handleSwapSelect(w);
@@ -158,6 +161,21 @@ export function WeekView() {
             setEditingDate(null);
             setEditingWorkout(null);
           }}
+        />
+      )}
+
+      {templateDate && (
+        <DayTemplatePicker
+          targetDate={templateDate}
+          onApplyDay={(sourceDate) => {
+            workoutActions.applyDay({ sourceDate, targetDate: templateDate });
+            setTemplateDate(null);
+          }}
+          onApplyTemplate={(templateId) => {
+            workoutActions.createFromTemplate({ templateId, date: templateDate });
+            setTemplateDate(null);
+          }}
+          onClose={() => setTemplateDate(null)}
         />
       )}
     </div>

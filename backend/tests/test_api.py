@@ -200,3 +200,43 @@ def test_ical_feed(client):
     assert "VCALENDAR" in content
     assert "VEVENT" in content
     assert "Easy Run" in content
+
+
+def test_apply_day_copies_plan_not_actuals(client):
+    client.get("/api/weeks/2026-03-02")
+    client.post("/api/workouts", json={"date": "2026-03-03", "workout_type": "strength"})
+    client.post("/api/workouts", json={
+        "date": "2026-03-03",
+        "workout_type": "long_run",
+        "distance": 12.0,
+        "pace_seconds": 540,
+        "actual_pace_seconds": 545,
+        "is_completed": True,
+    })
+
+    r = client.post("/api/workouts/apply-day", json={
+        "source_date": "2026-03-03",
+        "target_date": "2026-03-05",
+    })
+    assert r.status_code == 201
+
+    target = client.get("/api/workouts", params={"week_start": "2026-03-02"}).json()
+    applied = [w for w in target if w["date"] == "2026-03-05"]
+    assert len(applied) == 2
+    run = next(w for w in applied if w["workout_type"] == "long_run")
+    assert run["pace_seconds"] == 540          # target pace copied
+    assert run["actual_pace_seconds"] is None   # actual reset
+    assert run["is_completed"] is False         # completion reset
+
+
+def test_recent_days_dedupes_by_shape(client):
+    client.get("/api/weeks/2026-03-02")
+    # Two days with the SAME shape (easy_run) + one different (strength)
+    client.post("/api/workouts", json={"date": "2026-03-02", "workout_type": "easy_run"})
+    client.post("/api/workouts", json={"date": "2026-03-03", "workout_type": "easy_run"})
+    client.post("/api/workouts", json={"date": "2026-03-04", "workout_type": "strength"})
+
+    days = client.get("/api/workouts/recent-days").json()
+    shapes = [sorted(w["workout_type"] for w in d["workouts"]) for d in days]
+    # Only two distinct shapes despite three days
+    assert shapes == [["strength"], ["easy_run"]]

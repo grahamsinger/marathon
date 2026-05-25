@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createWorkout, updateWorkout, deleteWorkout, createFromTemplate, swapWorkouts } from '../api';
+import { createWorkout, updateWorkout, deleteWorkout, createFromTemplate, swapWorkouts, applyDay } from '../api';
 import type { Workout } from '../types';
 
 export function useWorkouts(weekStart: string) {
@@ -8,6 +8,7 @@ export function useWorkouts(weekStart: string) {
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['week', weekStart] });
     queryClient.invalidateQueries({ queryKey: ['workouts', 'all'] });
+    queryClient.invalidateQueries({ queryKey: ['recent-days'] });
   };
 
   const create = useMutation({
@@ -39,11 +40,18 @@ export function useWorkouts(weekStart: string) {
     onSuccess: invalidate,
   });
 
+  const applyDayMutation = useMutation({
+    mutationFn: ({ sourceDate, targetDate }: { sourceDate: string; targetDate: string }) =>
+      applyDay(sourceDate, targetDate),
+    onSuccess: invalidate,
+  });
+
   return {
     createWorkout: create.mutate,
     updateWorkout: update.mutate,
     deleteWorkout: remove.mutate,
     createFromTemplate: fromTemplate.mutate,
     swapWorkouts: swap.mutate,
+    applyDay: applyDayMutation.mutate,
   };
 }

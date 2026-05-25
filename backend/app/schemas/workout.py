@@ -49,3 +49,13 @@ class WorkoutFromTemplate(BaseModel):
 class WorkoutSwap(BaseModel):
     workout_id_1: int
     workout_id_2: int
+
+
+class ApplyDay(BaseModel):
+    source_date: date
+    target_date: date
+
+
+class RecentDay(BaseModel):
+    date: date
+    workouts: list[WorkoutResponse]

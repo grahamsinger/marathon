@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Week, Workout, WorkoutTemplate, PaceDataPoint, RaceInfo, Feedback } from './types';
+import type { Week, Workout, WorkoutTemplate, PaceDataPoint, RaceInfo, Feedback, RecentDay } from './types';
 
 const api = axios.create({ baseURL: '/api' });
 
@@ -28,6 +28,14 @@ export const swapWorkouts = (id1: number, id2: number) =>
 
 export const fetchAllWorkouts = () =>
   api.get<Workout[]>('/workouts/all').then((r) => r.data);
+
+export const getRecentDays = () =>
+  api.get<RecentDay[]>('/workouts/recent-days').then((r) => r.data);
+
+export const applyDay = (sourceDate: string, targetDate: string) =>
+  api
+    .post<Workout[]>('/workouts/apply-day', { source_date: sourceDate, target_date: targetDate })
+    .then((r) => r.data);
 
 // Templates
 export const getTemplates = () =>

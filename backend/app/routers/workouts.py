@@ -12,6 +12,8 @@ from app.schemas.workout import (
     WorkoutResponse,
     WorkoutFromTemplate,
     WorkoutSwap,
+    ApplyDay,
+    RecentDay,
 )
 
 router = APIRouter(prefix="/api/workouts", tags=["workouts"])
@@ -34,6 +36,33 @@ def _get_or_create_week(db: Session, workout_date: date) -> Week:
 @router.get("/all", response_model=list[WorkoutResponse])
 def list_all_workouts(db: Session = Depends(get_db)):
     return db.query(Workout).order_by(Workout.date.desc()).all()
+
+
+@router.get("/recent-days", response_model=list[RecentDay])
+def recent_days(limit: int = 5, db: Session = Depends(get_db)):
+    """Recent distinct days that have workouts, most recent first.
+
+    De-duplicated by the day's "shape" (its set of workout types) so the list
+    surfaces distinct day setups to reuse, not the same combo repeated.
+    """
+    dates = [
+        d[0]
+        for d in db.query(Workout.date).distinct().order_by(Workout.date.desc()).all()
+    ]
+    result: list[dict] = []
+    seen_shapes: set[tuple[str, ...]] = set()
+    for d in dates:
+        workouts = (
+            db.query(Workout).filter(Workout.date == d).order_by(Workout.id).all()
+        )
+        shape = tuple(sorted(w.workout_type for w in workouts))
+        if shape in seen_shapes:
+            continue
+        seen_shapes.add(shape)
+        result.append({"date": d, "workouts": workouts})
+        if len(result) >= limit:
+            break
+    return result
 
 
 @router.get("", response_model=list[WorkoutResponse])
@@ -100,6 +129,45 @@ def create_from_template(data: WorkoutFromTemplate, db: Session = Depends(get_db
     db.commit()
     db.refresh(workout)
     return workout
+
+
+@router.post("/apply-day", response_model=list[WorkoutResponse], status_code=201)
+def apply_day(data: ApplyDay, db: Session = Depends(get_db)):
+    """Copy all workouts from one day onto another (additive).
+
+    Copies the plan (type, distance, target pace, etc.) but resets actual pace
+    and completion, since the target day is being planned, not logged.
+    """
+    source = (
+        db.query(Workout)
+        .filter(Workout.date == data.source_date)
+        .order_by(Workout.id)
+        .all()
+    )
+    if not source:
+        raise HTTPException(404, "No workouts on the source date")
+
+    week = _get_or_create_week(db, data.target_date)
+    created = []
+    for w in source:
+        new_workout = Workout(
+            week_id=week.id,
+            date=data.target_date,
+            workout_type=w.workout_type,
+            distance=w.distance,
+            pace_seconds=w.pace_seconds,
+            actual_pace_seconds=None,
+            interval_pace_seconds=w.interval_pace_seconds,
+            duration_minutes=w.duration_minutes,
+            description=w.description,
+            is_completed=False,
+        )
+        db.add(new_workout)
+        created.append(new_workout)
+    db.commit()
+    for w in created:
+        db.refresh(w)
+    return created
 
 
 @router.post("/swap", response_model=list[WorkoutResponse])

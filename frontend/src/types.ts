@@ -29,6 +29,11 @@ export interface Week {
   workouts: Workout[];
 }
 
+export interface RecentDay {
+  date: string;
+  workouts: Workout[];
+}
+
 export interface WorkoutTemplate {
   id: number;
   name: string;
