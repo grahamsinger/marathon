@@ -64,7 +64,7 @@ export function DayCard({
             title="Apply a saved template or copy a recent day"
             className="w-full py-1.5 border border-dashed border-gray-200 rounded-lg text-gray-400 hover:text-gray-600 hover:border-gray-300 transition-colors text-xs"
           >
-            Templates
+            From Template
           </button>
         </div>
       </div>
