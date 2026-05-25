@@ -16,7 +16,7 @@ export function CompactWeekRow({ weekStart, workouts, onNavigate }: Props) {
 
   return (
     <div
-      className="grid grid-cols-7 gap-3 opacity-60 cursor-pointer"
+      className="hidden sm:grid grid-cols-7 gap-3 opacity-60 cursor-pointer"
       onClick={() => onNavigate(weekStart)}
     >
       {days.map((date) => {

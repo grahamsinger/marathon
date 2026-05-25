@@ -50,25 +50,27 @@ export function Header() {
   return (
     <header className="border-b bg-white">
       <div className="mx-auto px-4 py-3">
-        <div className="flex items-center justify-between gap-6">
-          <div className="flex items-center gap-6 shrink-0">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-4">
             <h1 className="text-lg font-bold text-gray-900 whitespace-nowrap">Marathon Training</h1>
-            <nav className="flex gap-1">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleCopyIcal}
+                className="px-3 py-1.5 rounded text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors whitespace-nowrap"
+              >
+                {copied ? 'Copied!' : 'iCal Link'}
+              </button>
+              <FeedbackModal />
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+            <nav className="flex flex-wrap gap-1">
               {navLink('/', 'Calendar')}
               {navLink('/templates', 'Templates')}
               {navLink('/pace', 'Pace Trend')}
               {navLink('/summary', 'Summary')}
             </nav>
-            <button
-              onClick={handleCopyIcal}
-              className="px-3 py-1.5 rounded text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors whitespace-nowrap"
-            >
-              {copied ? 'Copied!' : 'iCal Link'}
-            </button>
-          </div>
-          <div className="flex items-center gap-4 shrink-0">
             <RaceCountdown />
-            <FeedbackModal />
           </div>
         </div>
       </div>

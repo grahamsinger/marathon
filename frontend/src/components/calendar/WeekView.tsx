@@ -52,7 +52,7 @@ export function WeekView() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <WeekNavigation weekStart={weekStart} onNavigate={setWeekStart} />
         <MileageBar
           workouts={week?.workouts ?? []}
@@ -110,7 +110,7 @@ export function WeekView() {
         onNavigate={setWeekStart}
       />
 
-      <div className="grid grid-cols-7 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-7 gap-3">
         {days.map((date) => (
           <DayCard
             key={date}

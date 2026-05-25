@@ -22,8 +22,8 @@ export function DayTemplatePicker({ targetDate, onApplyDay, onApplyTemplate, onC
   const recent = recentDays.filter((d) => d.date !== targetDate);
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[60]" onClick={onClose}>
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-5" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-[60]" onClick={onClose}>
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-5 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-3">
           <h4 className="font-semibold">Add from template</h4>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">&times;</button>
