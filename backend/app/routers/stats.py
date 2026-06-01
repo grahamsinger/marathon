@@ -14,6 +14,7 @@ RUNNING_TYPES = ["long_run", "medium_long_run", "speed_work", "easy_run"]
 class PaceDataPoint(BaseModel):
     date: date
     pace_seconds: int
+    actual_pace_seconds: int | None = None
     distance: float
 
 
@@ -33,7 +34,12 @@ def pace_trend(db: Session = Depends(get_db)):
         .all()
     )
     return [
-        PaceDataPoint(date=w.date, pace_seconds=w.pace_seconds, distance=w.distance or 0)
+        PaceDataPoint(
+            date=w.date,
+            pace_seconds=w.pace_seconds,
+            actual_pace_seconds=w.actual_pace_seconds,
+            distance=w.distance or 0,
+        )
         for w in workouts
     ]
 

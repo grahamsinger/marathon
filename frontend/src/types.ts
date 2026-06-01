@@ -48,6 +48,7 @@ export interface WorkoutTemplate {
 export interface PaceDataPoint {
   date: string;
   pace_seconds: number;
+  actual_pace_seconds: number | null;
   distance: number;
 }
 
