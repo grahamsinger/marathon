@@ -138,7 +138,7 @@ export function WorkoutForm({
               <label className="block text-xs font-medium text-gray-600 mb-1">Distance (miles)</label>
               <input
                 type="number"
-                step="0.1"
+                step="0.01"
                 min="0"
                 value={distance}
                 onChange={(e) => setDistance(e.target.value)}

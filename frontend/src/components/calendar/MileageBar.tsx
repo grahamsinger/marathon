@@ -33,7 +33,7 @@ export function MileageBar({ workouts, target, onTargetChange }: Props) {
           >
             <input
               type="number"
-              step="0.1"
+              step="0.01"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onBlur={() => {
