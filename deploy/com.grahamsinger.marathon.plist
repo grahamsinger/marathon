@@ -21,6 +21,8 @@
         <string>0.0.0.0</string>
         <string>--port</string>
         <string>8000</string>
+        <string>--log-config</string>
+        <string>/Users/grahamsinger/dev/claude_code/marathon_training/backend/log_config.json</string>
     </array>
 
     <key>WorkingDirectory</key>
