@@ -11,6 +11,7 @@ interface Props {
   onSave: (data: Partial<Workout> & { date: string; workout_type: string }) => void;
   onUpdate: (id: number, data: Partial<Workout>) => void;
   onDelete?: (id: number) => void;
+  onSwap?: (id: number) => void;
   onSaveAsTemplate: (data: Omit<WorkoutTemplate, 'id'>) => void;
   onApplyTemplate: (templateId: number, date: string) => void;
   onClose: () => void;
@@ -26,6 +27,7 @@ export function WorkoutForm({
   onSave,
   onUpdate,
   onDelete,
+  onSwap,
   onSaveAsTemplate,
   onApplyTemplate,
   onClose,
@@ -119,6 +121,16 @@ export function WorkoutForm({
           </button>
         )}
 
+        {isEditing && (
+          <button
+            type="button"
+            onClick={() => setShowSaveTemplate(!showSaveTemplate)}
+            className="mb-4 text-sm text-blue-600 hover:text-blue-800"
+          >
+            Save as template...
+          </button>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Type</label>
@@ -179,25 +191,29 @@ export function WorkoutForm({
             />
           </div>
 
-          <div className="flex items-center justify-between pt-2">
-            <div className="flex gap-2">
-              {isEditing && onDelete && (
-                <button
-                  type="button"
-                  onClick={() => { onDelete(workout.id); onClose(); }}
-                  className="px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg"
-                >
-                  Delete
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={() => setShowSaveTemplate(!showSaveTemplate)}
-                className="px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg"
-              >
-                Save as Template
-              </button>
-            </div>
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
+            {isEditing && (onDelete || onSwap) ? (
+              <div className="inline-flex rounded-lg border border-gray-300 divide-x divide-gray-300 overflow-hidden">
+                {onDelete && (
+                  <button
+                    type="button"
+                    onClick={() => { onDelete(workout.id); onClose(); }}
+                    className="px-3 py-2 text-sm font-medium bg-red-600 text-white hover:bg-red-700"
+                  >
+                    Delete
+                  </button>
+                )}
+                {onSwap && (
+                  <button
+                    type="button"
+                    onClick={() => { onSwap(workout.id); onClose(); }}
+                    className="px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Swap
+                  </button>
+                )}
+              </div>
+            ) : <div />}
             <button
               type="submit"
               className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700"

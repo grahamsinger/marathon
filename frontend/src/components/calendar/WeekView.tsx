@@ -129,12 +129,10 @@ export function WeekView() {
                 setEditingWorkout(w);
               }
             }}
-            onDeleteWorkout={(id) => workoutActions.deleteWorkout(id)}
             onToggleComplete={(w) =>
               workoutActions.updateWorkout({ id: w.id, data: { is_completed: !w.is_completed } })
             }
             swapSourceId={swapSourceId}
-            onSwapSelect={handleSwapSelect}
           />
         ))}
       </div>
@@ -153,6 +151,7 @@ export function WeekView() {
           onSave={(data) => workoutActions.createWorkout(data)}
           onUpdate={(id, data) => workoutActions.updateWorkout({ id, data })}
           onDelete={(id) => workoutActions.deleteWorkout(id)}
+          onSwap={(id) => setSwapSourceId(id)}
           onSaveAsTemplate={(data) => createTemplate(data)}
           onApplyTemplate={(templateId, date) =>
             workoutActions.createFromTemplate({ templateId, date })

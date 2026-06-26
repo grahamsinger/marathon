@@ -8,10 +8,8 @@ interface Props {
   onAddWorkout: () => void;
   onOpenTemplates: () => void;
   onEditWorkout: (workout: Workout) => void;
-  onDeleteWorkout: (id: number) => void;
   onToggleComplete: (workout: Workout) => void;
   swapSourceId: number | null;
-  onSwapSelect: (workout: Workout) => void;
 }
 
 export function DayCard({
@@ -20,10 +18,8 @@ export function DayCard({
   onAddWorkout,
   onOpenTemplates,
   onEditWorkout,
-  onDeleteWorkout,
   onToggleComplete,
   swapSourceId,
-  onSwapSelect,
 }: Props) {
   const today = isToday(date);
 
@@ -46,10 +42,8 @@ export function DayCard({
             key={workout.id}
             workout={workout}
             onEdit={() => onEditWorkout(workout)}
-            onDelete={() => onDeleteWorkout(workout.id)}
             onToggleComplete={() => onToggleComplete(workout)}
             isSwapSource={swapSourceId === workout.id}
-            onSwapSelect={() => onSwapSelect(workout)}
           />
         ))}
         <div className="mt-auto flex flex-col gap-1">
