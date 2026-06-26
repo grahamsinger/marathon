@@ -13,7 +13,7 @@ export PATH="/usr/bin:/bin:/usr/sbin:/sbin"
 
 DB="/Users/grahamsinger/dev/claude_code/marathon_training/backend/marathon_training.db"
 DEST="/Users/grahamsinger/Library/Mobile Documents/com~apple~CloudDocs/data"
-KEEP=60   # how many recent snapshots to retain (each is tiny, ~28 KB)
+KEEP=5    # how many recent snapshots to retain (each is tiny, ~28 KB)
 
 mkdir -p "$DEST"
 STAMP="$(date +%Y%m%d-%H%M%S)"
