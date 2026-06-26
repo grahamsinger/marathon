@@ -26,33 +26,33 @@ function WorkoutRow({
       className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
       onClick={onEdit}
     >
-      <td className="py-2.5 px-3 text-sm text-gray-700 whitespace-nowrap">
+      <td className="py-1.5 px-3 text-sm text-gray-700 whitespace-nowrap">
         {formatDate(workout.date)}
       </td>
-      <td className="py-2.5 px-3">
+      <td className="py-1.5 px-3">
         <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium border ${colors}`}>
           {label}
         </span>
       </td>
-      <td className="py-2.5 px-3 text-sm text-gray-700 text-right">
+      <td className="py-1.5 px-3 text-sm text-gray-700 text-right">
         {workout.distance != null ? `${workout.distance} mi` : '—'}
       </td>
-      <td className="py-2.5 px-3 text-sm text-gray-700 text-right whitespace-nowrap">
+      <td className="py-1.5 px-3 text-sm text-gray-700 text-right whitespace-nowrap">
         {workout.pace_seconds != null ? `${formatPace(workout.pace_seconds)} /mi` : '—'}
         {workout.actual_pace_seconds != null && (
           <div className="text-xs text-gray-400">act {formatPace(workout.actual_pace_seconds)} /mi</div>
         )}
       </td>
-      <td className="py-2.5 px-3 text-sm text-gray-700 text-right">
+      <td className="py-1.5 px-3 text-sm text-gray-700 text-right">
         {workout.duration_minutes != null
           ? `${workout.duration_minutes} min`
           : workout.distance != null && workout.pace_seconds != null
             ? `${Math.round((workout.distance * workout.pace_seconds) / 60)} min`
             : '—'}
       </td>
-      <td className="py-2.5 px-3 text-center">
+      <td className="py-1.5 px-3 text-center">
         <label
-          className="inline-flex items-center justify-center w-8 h-8 cursor-pointer"
+          className="inline-flex items-center justify-center w-7 h-7 cursor-pointer"
           onClick={(e) => e.stopPropagation()}
         >
           <input
@@ -67,6 +67,19 @@ function WorkoutRow({
         </label>
       </td>
     </tr>
+  );
+}
+
+function Chevron({ expanded }: { expanded: boolean }) {
+  return (
+    <svg
+      className={`w-3 h-3 text-gray-400 transition-transform ${expanded ? 'rotate-90' : ''}`}
+      viewBox="0 0 12 12"
+      fill="currentColor"
+      aria-hidden
+    >
+      <path d="M4 2l4 4-4 4z" />
+    </svg>
   );
 }
 
@@ -179,6 +192,27 @@ export function WorkoutSummary() {
     if (q.data) targetByWeek[q.data.week_start] = q.data.mileage_target;
   });
 
+  // Group workouts into weeks (newest first), preserving each week's existing
+  // newest-first row order.
+  const weekGroups = useMemo(() => {
+    const map = new Map<string, Workout[]>();
+    for (const w of workouts ?? []) {
+      const monday = getMondayOfWeek(new Date(w.date + 'T00:00:00'));
+      if (!map.has(monday)) map.set(monday, []);
+      map.get(monday)!.push(w);
+    }
+    return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
+  }, [workouts]);
+
+  // How many of the newest weeks start expanded; older weeks start collapsed.
+  // Tapping a week header overrides its default.
+  const DEFAULT_EXPANDED_WEEKS = 2;
+  const [expandOverrides, setExpandOverrides] = useState<Record<string, boolean>>({});
+  const isExpanded = (monday: string, index: number) =>
+    expandOverrides[monday] ?? index < DEFAULT_EXPANDED_WEEKS;
+  const toggleWeek = (monday: string, index: number) =>
+    setExpandOverrides((o) => ({ ...o, [monday]: !(o[monday] ?? index < DEFAULT_EXPANDED_WEEKS) }));
+
   const handleToggleComplete = (workout: Workout) => {
     const ws = getMondayOfWeek(new Date(workout.date + 'T00:00:00'));
     updateWorkoutApi(workout.id, { is_completed: !workout.is_completed }).then(() => {
@@ -216,16 +250,50 @@ export function WorkoutSummary() {
             <th className="py-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Done</th>
           </tr>
         </thead>
-        <tbody>
-          {workouts.map((workout) => (
-            <WorkoutRow
-              key={workout.id}
-              workout={workout}
-              onEdit={() => setEditingWorkout(workout)}
-              onToggleComplete={() => handleToggleComplete(workout)}
-            />
-          ))}
-        </tbody>
+        {weekGroups.map(([monday, weekWorkouts], index) => {
+          const expanded = isExpanded(monday, index);
+          const label = new Date(monday + 'T00:00:00').toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+          });
+          const target = targetByWeek[monday] ?? null;
+          const completedMiles = weekWorkouts.reduce(
+            (s, w) => s + (w.is_completed ? w.distance ?? 0 : 0),
+            0,
+          );
+          const doneCount = weekWorkouts.filter((w) => w.is_completed).length;
+
+          return (
+            <tbody key={monday}>
+              <tr
+                className="border-b border-gray-100 bg-gray-50 hover:bg-gray-100 cursor-pointer"
+                onClick={() => toggleWeek(monday, index)}
+              >
+                <td colSpan={6} className="py-2 px-3">
+                  <div className="sticky left-3 inline-flex items-center gap-3">
+                    <span className="flex items-center gap-2 text-sm font-semibold text-gray-700 whitespace-nowrap">
+                      <Chevron expanded={expanded} />
+                      Wk of {label}
+                    </span>
+                    <span className="text-xs text-gray-500 tabular-nums whitespace-nowrap">
+                      {completedMiles.toFixed(1)}
+                      {target != null ? ` / ${target}` : ''} mi · {doneCount}/{weekWorkouts.length} done
+                    </span>
+                  </div>
+                </td>
+              </tr>
+              {expanded &&
+                weekWorkouts.map((workout) => (
+                  <WorkoutRow
+                    key={workout.id}
+                    workout={workout}
+                    onEdit={() => setEditingWorkout(workout)}
+                    onToggleComplete={() => handleToggleComplete(workout)}
+                  />
+                ))}
+            </tbody>
+          );
+        })}
       </table>
       </div>
 
