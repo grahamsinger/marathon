@@ -16,4 +16,14 @@ dev = [
     "pytest>=8.0.0",
     "httpx>=0.28.0",
     "pytest-asyncio>=0.25.0",
+    "pytest-cov>=7.1.0",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["app"]
+# The real get_db generator and engine are swapped out by the test fixture,
+# and the SPA static-file handler only runs when frontend/dist is present —
+# neither is meaningful to unit-test, so they show as the only uncovered lines.
