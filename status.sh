@@ -4,9 +4,10 @@
 # the launchd agents, and the most recent backup (age + integrity).
 export PATH="/usr/bin:/bin:/usr/sbin:/sbin"
 
-DB_DIR="/Users/grahamsinger/Library/Mobile Documents/com~apple~CloudDocs/data"
-APP_LABEL="com.grahamsinger.marathon"
-BACKUP_LABEL="com.grahamsinger.marathon-backup"
+DB_DIR="$HOME/Library/Mobile Documents/com~apple~CloudDocs/data"
+APP_LABEL="com.marathon.app"
+BACKUP_LABEL="com.marathon.backup"
+HOST_LOCAL="$(scutil --get LocalHostName 2>/dev/null || hostname -s).local"
 
 ok()  { printf "  \033[32m✓\033[0m %s\n" "$1"; }
 bad() { printf "  \033[31m✗\033[0m %s\n" "$1"; }
@@ -23,7 +24,7 @@ fi
 # API reachable through the proxy on :80
 code=$(curl -s -o /dev/null -m 5 -w '%{http_code}' http://localhost/api/race-info)
 if [ "$code" = "200" ]; then
-  ok "proxy + API healthy on :80  (http://Grahams-MBP.local)"
+  ok "proxy + API healthy on :80  (http://$HOST_LOCAL)"
 else
   bad "proxy/API on :80 returned HTTP ${code:-no-response}  ->  ./start_httpd.sh"
 fi
@@ -32,7 +33,7 @@ fi
 if launchctl list | grep -q "${APP_LABEL}\$"; then
   ok "app launchd agent loaded (auto-restarts)"
 else
-  bad "app launchd agent NOT loaded  ->  launchctl load -w ~/Library/LaunchAgents/${APP_LABEL}.plist"
+  bad "app launchd agent NOT loaded  ->  ./deploy/install.sh"
 fi
 
 # launchd: backup agent loaded + last exit status

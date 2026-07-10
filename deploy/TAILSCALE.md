@@ -1,7 +1,7 @@
 # Remote access with Tailscale
 
-Goal: let the marathon app (running on this Mac) be reachable from your wife's
-iPhone **anywhere** — not just on the home Wi-Fi — without exposing it to the
+Goal: let the marathon app (running on this Mac) be reachable from a phone
+**anywhere** — not just on the home Wi-Fi — without exposing it to the
 public internet.
 
 ## How it fits the existing setup

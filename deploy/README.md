@@ -4,21 +4,21 @@ How the Marathon Training app runs on the local network, and how to operate it.
 The app is served from a Mac that stays on the home network; any device on the
 same network (or on the tailnet — see [TAILSCALE.md](TAILSCALE.md)) can use it.
 
-> **Machine-specific bits.** The launchd plists in this folder, the Apache
-> config, and the helper scripts embed this deployment's absolute paths,
-> username, and launchd labels (`com.grahamsinger.*`). To deploy on a different
-> machine, search-and-replace the username/repo path in `deploy/*.plist`,
-> `deploy/*.sh`, and the root scripts, and rename the labels if you like.
-> Below, `<your-mac>.local` stands for the server Mac's Bonjour hostname
-> (shown in System Settings → General → Sharing).
+Below, `<your-mac>.local` is the server Mac's Bonjour hostname (System
+Settings → General → Sharing → Local hostname).
 
 ## What runs where
 
 | Piece | Where | Managed by |
 |-------|-------|------------|
-| App (FastAPI + built frontend) | `127.0.0.1:8000` | launchd agent (`deploy/com.grahamsinger.marathon.plist`) |
+| App (FastAPI + built frontend) | `127.0.0.1:8000` | launchd agent `com.marathon.app` |
 | Reverse proxy (port-80 → 8000) | `:80` (Apache) | `/etc/apache2/other/marathon.conf` |
-| Daily DB backup → iCloud | runs at noon + on login | launchd agent (`deploy/com.grahamsinger.marathon-backup.plist`) |
+| Daily DB backup → iCloud | runs at noon + on login | launchd agent `com.marathon.backup` |
+
+The launchd plists are **generated, not committed**: `deploy/install.sh` writes
+them with this machine's absolute paths (launchd can't expand variables) and
+loads them. Re-run it any time — after moving the repo, changing agent
+settings, or on a new machine.
 
 Reachable on the network at **http://\<your-mac\>.local** (or the Mac's LAN IP).
 The app auto-starts at login and restarts if it crashes; Apache is started via
@@ -31,6 +31,7 @@ in git — it's the live data and is backed up to iCloud instead.
 
 | Script | Purpose | sudo |
 |--------|---------|------|
+| `./deploy/install.sh` | Generate + load the launchd agents for this machine | no |
 | `./startup.sh` | Bring up the app (launchd) + Apache proxy | yes (Apache) |
 | `./shutdown.sh` | Stop the app + Apache proxy | yes (Apache) |
 | `./start_httpd.sh` | Start/restart just the Apache proxy | yes |
@@ -75,15 +76,14 @@ The script verifies the snapshot, stops the app, snapshots the **current** DB
 first (as `pre-restore-<timestamp>.db`, so the restore is reversible), swaps the
 chosen file in, and restarts the app.
 
-**Manual equivalent**, if you'd rather do it by hand (plist names as in this
-repo — adjust if you renamed them):
+**Manual equivalent**, if you'd rather do it by hand:
 
 ```bash
-launchctl unload ~/Library/LaunchAgents/com.grahamsinger.marathon.plist
+launchctl unload ~/Library/LaunchAgents/com.marathon.app.plist
 cp "~/Library/Mobile Documents/com~apple~CloudDocs/data/<snapshot>.db" \
    backend/marathon_training.db
 rm -f backend/marathon_training.db-wal backend/marathon_training.db-shm
-launchctl load -w ~/Library/LaunchAgents/com.grahamsinger.marathon.plist
+launchctl load -w ~/Library/LaunchAgents/com.marathon.app.plist
 ```
 
 > **iCloud note:** iCloud may offload old snapshots to save space, showing them as
@@ -92,20 +92,15 @@ launchctl load -w ~/Library/LaunchAgents/com.grahamsinger.marathon.plist
 
 ## First-time / after a macOS reset
 
-The Apache proxy config and the launchd agents live in this `deploy/` folder as the
-source of truth. If this is a new machine, first update the absolute paths inside
-the plists and scripts (see the note at the top), then (re)install:
+Everything installs from this `deploy/` folder:
 
 ```bash
+# App + backup launchd agents (generated with this machine's paths)
+./deploy/install.sh
+
 # Reverse proxy (auto-loaded by macOS's httpd.conf)
 sudo cp deploy/marathon.apache.conf /etc/apache2/other/marathon.conf
 sudo apachectl configtest && sudo apachectl restart
-
-# App + backup launchd agents
-cp deploy/com.grahamsinger.marathon.plist        ~/Library/LaunchAgents/
-cp deploy/com.grahamsinger.marathon-backup.plist ~/Library/LaunchAgents/
-launchctl load -w ~/Library/LaunchAgents/com.grahamsinger.marathon.plist
-launchctl load -w ~/Library/LaunchAgents/com.grahamsinger.marathon-backup.plist
 ```
 
 To make **Apache** come up on every boot (one-time):

@@ -3,7 +3,7 @@
 # (React SPA + API) from a single FastAPI server on port 8000.
 #
 # Access from any device on the local network:
-#   http://Grahams-MBP.local:8000   (or http://<this-mac-ip>:8000)
+#   http://<your-mac>.local:8000   (or http://<this-mac-ip>:8000)
 set -e
 
 DIR="$(cd "$(dirname "$0")" && pwd)"

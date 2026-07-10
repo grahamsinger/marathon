@@ -11,9 +11,10 @@
 set -euo pipefail
 export PATH="/usr/bin:/bin:/usr/sbin:/sbin"
 
-DB="/Users/grahamsinger/dev/claude_code/marathon_training/backend/marathon_training.db"
-BACKUPS="/Users/grahamsinger/Library/Mobile Documents/com~apple~CloudDocs/data"
-APP_PLIST="$HOME/Library/LaunchAgents/com.grahamsinger.marathon.plist"
+REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+DB="$REPO_DIR/backend/marathon_training.db"
+BACKUPS="$HOME/Library/Mobile Documents/com~apple~CloudDocs/data"
+APP_PLIST="$HOME/Library/LaunchAgents/com.marathon.app.plist"
 
 if [ $# -eq 0 ]; then
   echo "Available snapshots (newest first):"

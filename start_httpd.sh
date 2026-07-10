@@ -1,6 +1,6 @@
 #!/bin/bash
 # Start the Apache reverse proxy that fronts the Marathon Training app on
-# port 80, so it's reachable at http://Grahams-MBP.local (no port in the URL).
+# port 80, so it's reachable at http://<your-mac>.local (no port in the URL).
 #
 # The proxy config itself lives in deploy/marathon.apache.conf and is installed
 # to /etc/apache2/other/marathon.conf (auto-loaded by macOS's httpd.conf). This
@@ -32,4 +32,4 @@ else
   sudo apachectl start
 fi
 
-echo "Done. App should be reachable at http://Grahams-MBP.local (proxy -> :8000)."
+echo "Done. App should be reachable at http://$(scutil --get LocalHostName 2>/dev/null || hostname -s).local (proxy -> :8000)."

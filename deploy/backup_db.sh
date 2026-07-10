@@ -6,13 +6,14 @@
 # torn/locked file mid-write.
 #
 # Run manually any time:   ./deploy/backup_db.sh
-# Runs automatically daily via the LaunchAgent:
-#   deploy/com.grahamsinger.marathon-backup.plist
+# Runs automatically daily via the com.marathon.backup LaunchAgent
+# (generated and loaded by deploy/install.sh).
 set -euo pipefail
 export PATH="/usr/bin:/bin:/usr/sbin:/sbin"
 
-DB="/Users/grahamsinger/dev/claude_code/marathon_training/backend/marathon_training.db"
-DEST="/Users/grahamsinger/Library/Mobile Documents/com~apple~CloudDocs/data"
+REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+DB="$REPO_DIR/backend/marathon_training.db"
+DEST="$HOME/Library/Mobile Documents/com~apple~CloudDocs/data"
 KEEP=5    # how many recent snapshots to retain (each is tiny, ~28 KB)
 
 mkdir -p "$DEST"
