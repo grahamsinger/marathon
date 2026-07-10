@@ -47,7 +47,7 @@ noon run was missed while the Mac was closed (it then runs on next wake/login).
 ## Backups
 
 - **Where:** `~/Library/Mobile Documents/com~apple~CloudDocs/data/marathon_training-<timestamp>.db`
-- **When:** automatically daily at noon (and once at login); the newest 60 are kept.
+- **When:** automatically daily at noon (and once at login); the newest 5 are kept.
 - **On demand:** `./deploy/backup_db.sh`
 - Snapshots use SQLite's `.backup` (consistent even while the app is running).
 
