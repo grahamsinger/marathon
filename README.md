@@ -24,7 +24,8 @@ day-to-day from an iPhone.
 - **iCal feed** — a subscription URL (copy it from the header) that puts the
   whole plan in Apple/Google Calendar.
 - **Feedback** — a built-in "report a problem" modal; entries land in the
-  database for review.
+  database and are reviewable (and deletable) on the admin page at `/admin`
+  (deliberately not linked in the nav).
 
 ## How it's built
 

@@ -64,3 +64,9 @@ export const getRaceInfo = () =>
 // Feedback
 export const createFeedback = (data: { message: string; page?: string | null }) =>
   api.post<Feedback>('/feedback', data).then((r) => r.data);
+
+export const getFeedback = () =>
+  api.get<Feedback[]>('/feedback').then((r) => r.data);
+
+export const deleteFeedback = (id: number) =>
+  api.delete(`/feedback/${id}`);

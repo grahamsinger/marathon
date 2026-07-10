@@ -7,6 +7,10 @@ export default defineConfig({
     // jsdom gives component tests a DOM. Pure-logic tests (utils) run fine in it too.
     environment: 'jsdom',
     globals: true,
+    // Reset mock call history before every test so one test's calls can't
+    // leak into another's assertions (mock implementations are re-set in
+    // each suite's beforeEach).
+    clearMocks: true,
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     coverage: {
